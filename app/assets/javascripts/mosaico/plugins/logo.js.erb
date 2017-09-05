@@ -1,0 +1,10 @@
+window.mosaico = window.mosaico || { plugins: [] }
+window.mosaico.plugins = window.mosaico.plugins || []
+
+window.mosaico.plugins.push(
+  function(viewModel) {
+    var prefix = '<%= Rails.application.config.assets.prefix %>';
+    var assetPath = "<%= Mosaico.resolve_asset('mosaico/logo_transparent.png') %>";
+    viewModel.logoPath = window.mosaico.utilities.urlJoin([prefix, assetPath]);
+  }
+);

@@ -1,0 +1,12 @@
+<div
+  id='mosaico'
+  style='display: none'
+  data-template-url="<%= project.template.url %>"
+  data-template-name="<%= project.template.name %>"
+  data-template-asset-paths="<%= project.template.asset_paths.to_json %>"
+  <% if project.persisted? %>
+    data-project-id="<%= project.id %>"
+    data-project-metadata="<%= project.metadata %>"
+    data-project-content="<%= project.content %>"
+  <% end %>
+></div>

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <%= javascript_include_tag "mosaico/application" %>
+    <%= translations_include_tag %>
+    <%= stylesheet_link_tag "mosaico/application" %>
+    <%= csrf_meta_tag %>
+  </head>
+
+  <body>
+    <%= yield %>
+  </body>
+</html>

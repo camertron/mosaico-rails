@@ -1,0 +1,51 @@
+//= require mosaico/dist/vendor/jquery.min.js
+//= require mosaico/dist/vendor/knockout.js
+//= require mosaico/dist/vendor/jquery-ui.min.js
+//= require mosaico/dist/vendor/jquery.ui.touch-punch.min.js
+//= require mosaico/dist/vendor/load-image.all.min.js
+//= require mosaico/dist/vendor/canvas-to-blob.min.js
+//= require mosaico/dist/vendor/jquery.iframe-transport.js
+//= require mosaico/dist/vendor/jquery.fileupload.js
+//= require mosaico/dist/vendor/jquery.fileupload-process.js
+//= require mosaico/dist/vendor/jquery.fileupload-image.js
+//= require mosaico/dist/vendor/jquery.fileupload-validate.js
+//= require mosaico/dist/vendor/knockout-jqueryui.min.js
+//= require mosaico/dist/vendor/tinymce.min.js
+//= require mosaico/dist/mosaico.min.js
+
+//= require ./utilities.js
+
+//= require ./plugins/debug.js
+//= require ./plugins/logo.js
+//= require ./plugins/save.js
+//= require ./plugins/template_path.js
+//= require ./plugins/translations.js
+
+$(document).ready(function() {
+  var plugins = [].concat(window.mosaico.plugins);
+
+  var options = {
+    imgProcessorBackend: '<%= Mosaico::Engine.routes.url_helpers.mosaico_image_path %>',
+    // emailProcessorBackend: basePath + '/dl/',  // @TODO
+    titleToken: "MOSAICO Responsive Email Designer",
+    fileuploadConfig: {
+      url: '<%= Mosaico::Engine.routes.url_helpers.mosaico_image_path %>',
+      formData: {
+        authenticity_token: window.mosaico.utilities.authenticityToken()
+      }
+    }
+  };
+
+  var mosaicoDataElem = $('#mosaico');
+  var templateUrl = mosaicoDataElem.data('template-url');
+  var projectMetadata = mosaicoDataElem.data('project-metadata');
+  var projectContent = mosaicoDataElem.data('project-content');
+
+  Mosaico.start(
+    options,
+    templateUrl,
+    projectMetadata,
+    projectContent, // i.e. model
+    plugins
+  );
+});

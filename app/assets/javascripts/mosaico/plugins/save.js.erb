@@ -1,0 +1,70 @@
+// plugin for integrating save button
+// adapted from https://github.com/voidlabs/mosaico/issues/73#issuecomment-198584809
+window.mosaico = window.mosaico || { plugins: [] }
+window.mosaico.plugins = window.mosaico.plugins || []
+
+window.mosaico.plugins.push(
+  function(viewModel) {
+    var saveCmd = {
+      name: 'Save', // l10n happens in the template
+      enabled: ko.observable(true)
+    };
+
+    saveCmd.execute = function() {
+      saveCmd.enabled(false);
+      viewModel.metadata.changed = Date.now();
+
+      var mosaicoDataElem = $('#mosaico');
+      var id = mosaicoDataElem.data('project-id');
+      var templateName = mosaicoDataElem.data('template-name');
+
+      if (typeof viewModel.metadata.key == 'undefined') {
+        viewModel.metadata.key = id;
+      }
+
+      // This is the simplest for sending it as POST
+      // append postData with csrfToken
+      var params = {
+        data: {
+          // csrf_token: 'yourCsrfValueHere',  // @TODO
+          metadata: viewModel.exportMetadata(),
+          content: viewModel.exportJSON(),
+          html: viewModel.exportHTML(),
+          template_name: templateName,
+          authenticity_token: window.mosaico.utilities.authenticityToken()
+        }
+      }
+
+      var projectPath = "<%= Mosaico::Engine.routes.url_helpers.project_path(':id') %>";
+
+      if (id === undefined) {
+        params.type = 'post';
+        params.url = "<%= Mosaico::Engine.routes.url_helpers.projects_path %>"
+      } else {
+        params.type = 'patch';
+        params.url = projectPath.replace(':id', id);
+      }
+
+      $.ajax(params)
+        .done(function(response) {
+          viewModel.notifier.success(viewModel.t('Successfully saved.'));
+          var createdProjectPath = projectPath.replace(':id', response.project_id);
+          window.history.replaceState(
+            {}, 'Project ' + response.project_id, createdProjectPath
+          );
+        })
+        .fail(function(jqXHR, textStatus, error) {
+          console.log(textStatus);
+          console.log(error);
+          console.log(jqXHR);
+          viewModel.notifier.error(viewModel.t('Saving failed. Please try again in a few moment or contact us.'));
+        })
+        .always(function() {
+          saveCmd.enabled(true);
+        }
+      );
+    };
+
+    viewModel.save = saveCmd;
+  }
+);

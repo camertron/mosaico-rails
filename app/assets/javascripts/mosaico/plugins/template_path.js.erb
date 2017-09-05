@@ -1,0 +1,22 @@
+window.mosaico = window.mosaico || { plugins: [] }
+window.mosaico.plugins = window.mosaico.plugins || []
+
+window.mosaico.plugins.push(
+  function(viewModel) {
+    var assetPaths = $('#mosaico').data('template-asset-paths');
+
+    viewModel.templatePath = function(url) {
+      var foundUrl;
+
+      if (assetPaths[url] === undefined) {
+        foundUrl = url;
+      } else {
+        foundUrl = window.mosaico.utilities.urlJoin([
+          '<%= Rails.application.config.assets.prefix %>', assetPaths[url]
+        ]);
+      }
+
+      return foundUrl;
+    }
+  }
+);
