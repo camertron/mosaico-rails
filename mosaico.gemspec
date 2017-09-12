@@ -14,8 +14,8 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
   s.version       = Mosaico::VERSION
 
-  s.add_dependency 'rails'
+  s.add_dependency 'css-rewrite', '~> 2.0'
+  s.add_dependency 'generated-assets', '~> 2.0'
   s.add_dependency 'mini_magick'
-  s.add_dependency 'generated-assets'
-  s.add_dependency 'css-rewrite'
+  s.add_dependency 'rails', '>= 4.0'
 end

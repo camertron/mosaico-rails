@@ -1,0 +1,57 @@
+"use strict";
+
+// adapted from mosaico's makeThumbs.js grunt task
+
+var grunt = require('grunt');
+var script = './tasks/lib/phantom-thumbnailer-editor.js';
+var phantombin = require('phantomjs-prebuilt').path;
+var outFolder = '<%= @template.edres_path %>';
+var templateFile = 'http://<%= Mosaico.url_join("#{@host}:#{@port}", @template.template_url) %>'
+var renderWidth = 680;
+var outputWidth = 340;
+
+var spawnParams = {
+  cmd: phantombin,
+  args: [
+    script,
+    renderWidth,
+    outputWidth,
+    templateFile,
+    outFolder
+  ]
+};
+
+console.log("Creating thumbnails for <%= @template.template_url %>");
+
+var phantomJSHandle = grunt.util.spawn(spawnParams, function(err, result, code) {
+  if (!err) {
+    return;
+  }
+
+  // Ignore intentional cleanup.
+  if (code === 15 /* SIGTERM */) {
+    return;
+  }
+
+  // If we're here, something went horribly wrong.
+  console.log('PhantomJS threw an error:');
+
+  // Print result to stderr because sometimes the 127 code means that a shared library is missing
+  String(result).split('\n').forEach(function(element) {
+    console.log(element)
+  });
+
+  if (code === 127) {
+    console.log(
+      'In order for this task to work properly, PhantomJS must be installed locally via NPM. ' +
+      'If you\'re seeing this message, generally that means the NPM install has failed. ' +
+      'Please submit an issue providing as much detail as possible at: ' +
+      'https://github.com/gruntjs/grunt-lib-phantomjs/issues'
+    );
+  } else {
+    console.log('PhantomJS exited unexpectedly with exit code ' + code + '.');
+  }
+});
+
+phantomJSHandle.stdout.pipe(process.stdout);
+phantomJSHandle.stderr.pipe(process.stderr);

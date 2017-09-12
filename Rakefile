@@ -1,4 +1,5 @@
 require 'rubygems'
 require 'bundler/setup'
+require 'rubygems/package_task'
 
-load 'rails/tasks/engine.rake'
+Bundler::GemHelper.install_tasks

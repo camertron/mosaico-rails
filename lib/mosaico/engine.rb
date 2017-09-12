@@ -18,16 +18,13 @@ module Mosaico
       config.assets.precompile << 'mosaico/logo_transparent.png'
 
       CssRewrite.configure do |config|
-        config.rewrite do |url, filename|
-          next url unless filename.start_with?(Mosaico.vendor_asset_root.to_s)
-          next url if url.start_with?('data:')
+        config.rewrite(/\A#{Mosaico.vendor_asset_root.to_s}/) do |url|
+          next if url.start_with?('data:')
           asset_path = Mosaico.url_join('mosaico/dist', URI.parse(url).path)
 
           if resolved_url = Mosaico.resolve_asset(asset_path)
             prefix = Rails.application.config.assets.prefix
             Mosaico.url_join(prefix, resolved_url)
-          else
-            url
           end
         end
       end

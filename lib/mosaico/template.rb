@@ -22,6 +22,15 @@ module Mosaico
       @template_path ||= File.join(dir, "#{full_name}.html")
     end
 
+    def template_url
+      Mosaico::Engine.routes.url_helpers.template_path(name)
+    end
+
+    # where the template's thumbnails are stored
+    def edres_path
+      File.join(dir, 'edres')
+    end
+
     def template_content
       @template_content ||= begin
         File.read(template_path).gsub(SRC_REGEX) do
