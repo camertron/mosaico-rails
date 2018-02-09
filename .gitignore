@@ -1,6 +1,8 @@
+.DS_Store
 .ruby-version
 Gemfile*.lock
 pkg/
+vendor/assets/mosaico-0.16.0/mosaico/package-lock.json
 vendor/assets/mosaico-*/mosaico/bower_components
 vendor/assets/mosaico-*/mosaico/node_modules
 vendor/assets/mosaico-*/mosaico/.tmp

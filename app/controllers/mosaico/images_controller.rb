@@ -95,11 +95,6 @@ module Mosaico
       redirect_to image_url
     end
 
-    # def send_image(image)
-    #   image_path = image.class.uploader.path_to(image.file)
-    #   send_file image_path, content_type: image.content_type, disposition: 'inline'
-    # end
-
     def find_or_create_placeholder(width, height)
       image = PlaceholderImage.where(width: width, height: height).first
       return image if image
@@ -109,8 +104,8 @@ module Mosaico
       image.combine_options do |c|
         c.resize("#{width}x#{height}!")
         c.gravity('Center')
-        c.font('Arial')
-        c.pointsize(45)
+        c.font(File.join(Mosaico.vendor_font_root, 'LiberationSans-Regular.ttf'))
+        c.pointsize(width.to_i * height.to_i * 0.001)
         c.draw("text 0,0 '#{width}x#{height}'")
         c.border(1)
       end

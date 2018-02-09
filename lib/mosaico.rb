@@ -39,6 +39,12 @@ module Mosaico
       @vendor_lang_root ||= vendor_asset_root.join('mosaico', 'dist', 'lang')
     end
 
+    def vendor_font_root
+      @vendor_font_root ||= Mosaico::Engine.root.join(
+        'vendor', 'assets', 'fonts'
+      )
+    end
+
     def url_join(*segments)
       segments.compact!
 

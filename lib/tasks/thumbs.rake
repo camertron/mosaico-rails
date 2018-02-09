@@ -22,6 +22,13 @@ namespace :mosaico do
     script = ERB.new(File.read(script_path)).result(binding)
 
     Dir.chdir(Mosaico.vendor_asset_root.join('mosaico')) do
+      `npm ls 2>&1`
+
+      if $?.exitstatus != 0
+        puts 'Javascript dependencies are not installed, running `npm install`'
+        system 'npm install'
+      end
+
       exec("node -e #{Shellwords.escape(script)}")
     end
   end
