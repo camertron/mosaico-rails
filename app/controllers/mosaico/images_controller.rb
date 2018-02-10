@@ -27,21 +27,33 @@ module Mosaico
         when 'placeholder'
           placeholder = find_or_create_placeholder(*params[:params].split(','))
           send_image(placeholder)
-        # when 'cover'
-        #   @TODO
-        when 'resize'
+
+        when 'resize', 'cover'
           original_image = UploadedImage.find(id_from_params)
-          width = params.fetch(:width, original_image.width).to_i
-          height = params.fetch(:height, original_image.height).to_i
+          width, height = params[:params].split(',')
+          width = original_image.width if width == 'null'
+          height = original_image.height if height == 'null'
+          width = width.to_i
+          height = height.to_i
 
           image = UploadedImage.where(parent_id: id_from_params, width: width, height: height).first
           send_image(image) and return if image
 
           image_path = UploadedImage.uploader.path_to(original_image.file)
           resized_image = MiniMagick::Image.open(image_path)
-          resized_image.combine_options do |c|
-            c.resize("#{width}x#{height}")
-            c.antialias
+
+          if params[:method] == 'resize'
+            resized_image.combine_options do |c|
+              c.resize("#{width}x#{height}")
+              c.antialias
+            end
+          else
+            resized_image.combine_options do |c|
+              c.resize("#{width}x#{height}^")
+              c.gravity(:center)
+              c.extent("#{width}x#{height}>")
+              c.antialias
+            end
           end
 
           dest_file = File.basename(resized_image.path)
@@ -57,12 +69,13 @@ module Mosaico
           )
 
           send_image(resized_record)
+
         else
           if id_from_params
             image = UploadedImage.find(id_from_params)
             send_image(image)
           else
-            render json: { files: UploadedImage.all.map(&:to_json) }
+            render json: { files: UploadedImage.where(parent_id: nil).map(&:to_json) }
           end
       end
     end

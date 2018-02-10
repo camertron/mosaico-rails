@@ -1,5 +1,6 @@
 require 'mosaico/engine'
 require 'mosaico/template'
+require 'mosaico/versafix_template'
 require 'mosaico/version'
 
 module Mosaico
@@ -12,9 +13,8 @@ module Mosaico
   class << self
     attr_writer :default_locale
 
-    def register_template(name, dir, subdirs = ['edres', 'img'])
-      templates[name] = Template.new(name, dir, subdirs)
-      Rails.application.config.assets.precompile += templates[name].list_precomp_assets
+    def register_template(name, dir, subdirs: ['edres', 'img'], template_class: Template)
+      templates[name] = template_class.new(name, dir, subdirs).tap(&:register!)
     end
 
     def find_template(name)

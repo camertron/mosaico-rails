@@ -52,6 +52,8 @@ window.mosaico.plugins.push(
           window.history.replaceState(
             {}, 'Project ' + response.project_id, createdProjectPath
           );
+
+          mosaicoDataElem.data('project-id', response.project_id);
         })
         .fail(function(jqXHR, textStatus, error) {
           console.log(textStatus);

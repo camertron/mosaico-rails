@@ -53,9 +53,15 @@ module Mosaico
     end
 
     initializer 'mosaico.default_config' do |app|
+      TEMPLATE_CLASSES = {
+        'versafix-1' => Mosaico::VersafixTemplate
+      }
+
       %w(tedc15 tutorial versafix-1).each do |template|
         Mosaico.register_template(
-          template, Mosaico.vendor_template_root.join(template).to_s
+          template,
+          Mosaico.vendor_template_root.join(template).to_s,
+          template_class: TEMPLATE_CLASSES.fetch(template, Mosaico::Template)
         )
       end
 
