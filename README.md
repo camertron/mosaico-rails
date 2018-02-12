@@ -12,6 +12,8 @@ mosaico-rails is distributed as a rubygem. You'll need to add it to your Gemfile
 gem 'mosaico', '~> 1.0'
 ```
 
+In order to enable image manipulation, you'll need to install [imagemagick](https://www.imagemagick.org/script/index.php) or [graphicsmagick](http://www.graphicsmagick.org/). Both should be available via your package manager of choice. For example on MacOS, run `brew install imagemagick` or `brew install graphicsmagick`.
+
 Mosaico integrates with your Rails app by providing a Rails _engine_. You can read more about engines [here](http://guides.rubyonrails.org/engines.html). Adding Mosaico to your Gemfile should be enough to make its engine available to your application, but you'll need to tell Rails how to route requests to it. In engine parlance, this is referred to as "mounting." Open up config/routes.rb and mount the mosaico engine at the desired URL:
 
 ```ruby
