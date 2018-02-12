@@ -1,5 +1,5 @@
 module Mosaico
-  class LocalPlaceholderUploader < LocalUploader
+  class LocalPlaceholderBackend < LocalBackend
     def initialize
       super(Rails.root.join('public/mosaico/placeholders').to_s, '/mosaico/placeholders')
     end

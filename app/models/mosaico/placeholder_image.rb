@@ -1,8 +1,8 @@
 module Mosaico
   class PlaceholderImage < Image
     class << self
-      def uploader
-        Mosaico::Engine.config.placeholder_uploader
+      def backend
+        Mosaico::Engine.config.placeholder_backend
       end
     end
   end

@@ -6,11 +6,13 @@ require 'mosaico/version'
 module Mosaico
   DEFAULT_LOCALE = :en
 
-  autoload :LocalImageUploader,       'mosaico/local_image_uploader'
-  autoload :LocalPlaceholderUploader, 'mosaico/local_placeholder_uploader'
-  autoload :LocalUploader,            'mosaico/local_uploader'
+  autoload :LocalImageBackend,       'mosaico/local_image_backend'
+  autoload :LocalPlaceholderBackend, 'mosaico/local_placeholder_backend'
+  autoload :LocalBackend,            'mosaico/local_backend'
 
   class << self
+    include Mosaico::Engine.routes.url_helpers
+
     attr_writer :default_locale
 
     def register_template(name, dir, subdirs: ['edres', 'img'], template_class: Template)

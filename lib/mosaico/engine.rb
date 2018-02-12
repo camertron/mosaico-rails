@@ -65,8 +65,8 @@ module Mosaico
         )
       end
 
-      Mosaico::Engine.config.placeholder_uploader = Mosaico::LocalPlaceholderUploader.new
-      Mosaico::Engine.config.image_uploader = Mosaico::LocalImageUploader.new
+      Mosaico::Engine.config.placeholder_backend = Mosaico::LocalPlaceholderBackend.new
+      Mosaico::Engine.config.image_backend = Mosaico::LocalImageBackend.new
     end
   end
 end

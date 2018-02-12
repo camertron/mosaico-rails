@@ -5,7 +5,7 @@ module Mosaico
     def create
       files = params[:files].map do |file|
         dest_file = File.basename(file.tempfile.path)
-        UploadedImage.uploader.store!(file.tempfile.path, dest_file)
+        UploadedImage.backend.store(file.tempfile.path, as: dest_file)
         image = MiniMagick::Image.new(file.tempfile.path)
 
         record = UploadedImage.create!(
@@ -39,7 +39,7 @@ module Mosaico
           image = UploadedImage.where(parent_id: id_from_params, width: width, height: height).first
           send_image(image) and return if image
 
-          image_path = UploadedImage.uploader.path_to(original_image.file)
+          image_path = UploadedImage.backend.retrieve(original_image.file)
           resized_image = MiniMagick::Image.open(image_path)
 
           if params[:method] == 'resize'
@@ -57,7 +57,7 @@ module Mosaico
           end
 
           dest_file = File.basename(resized_image.path)
-          UploadedImage.uploader.store!(resized_image.path, dest_file)
+          UploadedImage.backend.store(resized_image.path, as: dest_file)
 
           resized_record = UploadedImage.create!(
             file: dest_file,
@@ -104,7 +104,7 @@ module Mosaico
     end
 
     def send_image(image)
-      image_url = image.class.uploader.url_to(image.file)
+      image_url = image.class.backend.url_to(image.file)
       redirect_to image_url
     end
 
@@ -124,7 +124,7 @@ module Mosaico
       end
 
       file = "#{width}x#{height}#{File.extname(image.path)}"
-      PlaceholderImage.uploader.store!(image.path, file)
+      PlaceholderImage.backend.store(image.path, as: file)
 
       PlaceholderImage.create!(
         file: file,

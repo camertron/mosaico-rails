@@ -1,8 +1,8 @@
 module Mosaico
   class UploadedImage < Image
     class << self
-      def uploader
-        Mosaico::Engine.config.image_uploader
+      def backend
+        Mosaico::Engine.config.image_backend
       end
     end
 

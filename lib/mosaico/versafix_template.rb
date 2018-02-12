@@ -1,4 +1,11 @@
 module Mosaico
+  # Unfortunately the versafix-1 template contains several image assets
+  # whose paths contain "google+", which sprockets appears not to like.
+  # Rails will refuse to serve these assets, resulting in errors and
+  # several broken images on the page. This class fixes the issues by
+  # replacing "google+" with "google_plus" and serving renamed assets
+  # on-the-fly. It's more complicated, yes, but means the original image
+  # and template files don't have to be modified.
   class VersafixTemplate < Template
     private
 
@@ -15,6 +22,8 @@ module Mosaico
       Rails.application.config.assets.precompile += remaining_assets
     end
 
+    # called by the superclass (i.e. Template) for each URL in the
+    # template's HTML code (CSS is handled by css-rewrite in engine.rb)
     def replacement_asset_url(asset_path)
       super.tap do |replacement_path|
         if google_plus_assets.include?(asset_path)
