@@ -1,6 +1,6 @@
 module Mosaico
   class ApplicationController < ActionController::Base
-    helper ApplicationHelper
+    helper ::Mosaico::ApplicationHelper
     before_action :set_locale
 
     private
