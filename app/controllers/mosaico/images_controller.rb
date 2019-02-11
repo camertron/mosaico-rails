@@ -1,7 +1,7 @@
 require 'mini_magick'
 
 module Mosaico
-  class ImagesController < ApplicationController
+  class ImagesController < ::Mosaico::ApplicationController
     def create
       files = params[:files].map do |file|
         dest_file = File.basename(file.tempfile.path)

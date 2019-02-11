@@ -1,5 +1,5 @@
 module Mosaico
-  class ProjectsController < ApplicationController
+  class ProjectsController < ::Mosaico::ApplicationController
     layout 'mosaico/application'
 
     def new
