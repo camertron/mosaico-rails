@@ -1,6 +1,6 @@
-//= require mosaico/dist/mosaico-material.min.css
+/*= require mosaico/dist/mosaico-material.min-fixed.css */
 
-// make colorpicker links visible
+/* make colorpicker links visible */
 .mo a:link, .mo a:visited {
   color: initial;
 }
