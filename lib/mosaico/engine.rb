@@ -9,10 +9,21 @@ module Mosaico
     initializer 'mosaico.assets' do |app|
       app.config.assets.paths << Mosaico.vendor_asset_root.to_s
 
+      # fonts and images
       ['mosaico/dist/fa', 'mosaico/dist/img'].each do |asset_path|
         config.assets.precompile += Dir.chdir(Mosaico.vendor_asset_root) do
           Dir.glob("#{asset_path}/**/*.*")
         end
+      end
+
+      # plugins
+      config.assets.precompile += Dir.chdir(Mosaico.vendor_asset_root) do
+        Dir.glob('mosaico/dist/vendor/plugins/*/plugin.js')
+      end
+
+      # themes
+      config.assets.precompile += Dir.chdir(Mosaico.vendor_asset_root) do
+        Dir.glob('mosaico/dist/vendor/themes/*/theme.js')
       end
 
       config.assets.precompile << 'mosaico/logo_transparent.png'
