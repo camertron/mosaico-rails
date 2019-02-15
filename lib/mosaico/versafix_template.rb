@@ -25,10 +25,10 @@ module Mosaico
     # called by the superclass (i.e. Template) for each URL in the
     # template's HTML code (CSS is handled by css-rewrite in engine.rb)
     def replacement_asset_url(asset_path)
-      super.tap do |replacement_path|
-        if google_plus_assets.include?(asset_path)
-          replacement_path.sub!('google+', 'google_plus')
-        end
+      if google_plus_assets.include?(asset_path)
+        Mosaico.resolve_asset(asset_path.sub('google+', 'google_plus'))
+      else
+        super
       end
     end
 
