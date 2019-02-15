@@ -67,7 +67,15 @@ module Mosaico
           asset.try(&:logical_path)
         end
       else
-        Rails.application.assets_manifest.assets[asset_path]
+        parts = asset_path.split(File::SEPARATOR)
+
+        0.upto(parts.size - 1) do |i|
+          candidate = File.join(*parts[i..-1])
+
+          if Rails.application.assets_manifest.assets.include?(candidate)
+            return Rails.application.assets_manifest.assets[candidate]
+          end
+        end
       end
     end
 
