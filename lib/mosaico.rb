@@ -76,6 +76,8 @@ module Mosaico
             return Rails.application.assets_manifest.assets[candidate]
           end
         end
+
+        nil
       end
     end
 
