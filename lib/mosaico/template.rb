@@ -37,8 +37,9 @@ module Mosaico
       @template_content ||= begin
         File.read(template_path).gsub(SRC_REGEX) do
           if subdirs.any? { |subdir| $1.start_with?("#{subdir}/") }
-            if replacement_url = replacement_asset_url(File.join(dir, $1))
-              next "src='#{replacement_url}'"
+
+            if replacement_url = replacement_asset_url($1)
+              next "src='#{Mosaico.url_join(prefix, Mosaico.resolve_asset(replacement_url))}'"
             end
           end
 
@@ -48,8 +49,9 @@ module Mosaico
     end
 
     def asset_paths
-      @asset_paths ||= list_precomp_assets.each_with_object({}) do |asset_path, ret|
-        short_path = asset_path[(dir.length + 1)..-1]
+      @asset_paths ||= list_assets.each_with_object({}) do |asset_path, ret|
+        asset_path = replacement_asset_url(asset_path)
+        short_path = asset_path.sub(/\A#{File.join('mosaico', 'templates', name)}#{File::SEPARATOR}/, '')
         ret[short_path] = Mosaico.resolve_asset(asset_path)
       end
     end
@@ -64,25 +66,28 @@ module Mosaico
 
     private
 
+    def prefix
+      Rails.application.config.assets.prefix
+    end
+
     def replacement_asset_url(asset_path)
-      if resolved_asset = Mosaico.resolve_asset(asset_path)
-        prefix = Rails.application.config.assets.prefix
-        Mosaico.url_join(prefix, resolved_asset)
-      end
+      list_assets.find { |tmpl_asset| tmpl_asset.end_with?(asset_path) }
     end
 
     def before_register
-      Rails.application.config.assets.precompile += list_precomp_assets
+      Rails.application.config.assets.precompile += list_assets
     end
 
     def after_register
     end
 
-    def list_precomp_assets
+    def list_assets
       subdirs.flat_map do |subdir|
-        # only allow images through for now
-        # TODO: what other file types are we going to need?
-        Dir.glob(File.join(dir, subdir, '**/*.{jpg,gif,png}'))
+        Dir.chdir(Mosaico.vendor_asset_root) do
+          # only allow images through for now
+          # TODO: what other file types are we going to need?
+          Dir.glob(File.join('mosaico', 'templates', name, subdir, '**/*.{jpg,gif,png}'))
+        end
       end
     end
   end

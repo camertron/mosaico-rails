@@ -3,6 +3,9 @@
   style='display: none'
   data-template-url="<%= project.template.url %>"
   data-template-name="<%= project.template.name %>"
+  data-mce-plugin-paths="<%= Mosaico.mce_plugin_assets.to_json %>"
+  data-mce-theme-paths="<%= Mosaico.mce_theme_assets.to_json %>"
+  data-mce-skin-paths="<%= Mosaico.mce_skin_assets.to_json %>"
   data-template-asset-paths="<%= project.template.asset_paths.to_json %>"
   <% if project.persisted? %>
     data-project-id="<%= project.id %>"

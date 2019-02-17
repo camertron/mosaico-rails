@@ -26,15 +26,31 @@ module Mosaico
         Dir.glob('mosaico/dist/vendor/themes/*/theme.js')
       end
 
+      # skins
+      config.assets.precompile += Mosaico.mce_skins.flat_map do |_, skin|
+        skin.list_precompile_assets
+      end
+
       config.assets.precompile << 'mosaico/logo_transparent.png'
 
       CssRewrite.configure do |config|
+        prefix = Rails.application.config.assets.prefix
+
+        Mosaico.mce_skins.each do |skin_name, skin|
+          config.rewrite(/\A#{skin.absolute_path}/) do |url|
+            next if url.start_with?('data:')
+
+            if resolved_url = skin.resolve_asset(url)
+              Mosaico.url_join(prefix, resolved_url)
+            end
+          end
+        end
+
         config.rewrite(/\A#{Mosaico.vendor_asset_root.to_s}/) do |url|
           next if url.start_with?('data:')
           asset_path = Mosaico.url_join('mosaico/dist', URI.parse(url).path)
 
           if resolved_url = Mosaico.resolve_asset(asset_path)
-            prefix = Rails.application.config.assets.prefix
             Mosaico.url_join(prefix, resolved_url)
           end
         end

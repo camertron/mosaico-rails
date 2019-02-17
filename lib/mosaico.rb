@@ -1,7 +1,25 @@
 require 'mosaico/engine'
+require 'mosaico/mce_skin'
 require 'mosaico/template'
 require 'mosaico/versafix_template'
 require 'mosaico/version'
+
+require 'uri'
+
+begin
+  require 'sprockets/rails/task'
+
+  Sprockets::Rails::Task.class_eval do
+    def initialize_with_retain(*args)
+      initialize_without_retain(*args)
+      Mosaico.sprockets_task = self
+    end
+
+    alias_method :initialize_without_retain, :initialize
+    alias_method :initialize, :initialize_with_retain
+  end
+rescue LoadError
+end
 
 module Mosaico
   DEFAULT_LOCALE = :en
@@ -14,6 +32,7 @@ module Mosaico
     include Mosaico::Engine.routes.url_helpers
 
     attr_writer :default_locale
+    attr_accessor :sprockets_task
 
     def register_template(name, dir, subdirs: ['edres', 'img'], template_class: Template)
       templates[name] = template_class.new(name, dir, subdirs).tap(&:register!)
@@ -57,23 +76,64 @@ module Mosaico
       segments.first.start_with?('/') ? "/#{joined}" : joined
     end
 
-    def resolve_asset(asset_path)
-      if Rails.application.config.assets.compile
-        asset = Rails.application.assets.find_asset(asset_path)
+    def mce_plugin_assets
+      @mce_plugin_assets ||= Dir.chdir(Mosaico.vendor_asset_root) do
+        Dir.glob(File.join(*%w(mosaico dist vendor plugins * plugin.js))).each_with_object({}) do |asset_path, ret|
+          name = File.dirname(asset_path).split(File::SEPARATOR).last
+          ret[name] = resolve_asset(asset_path)
+        end
+      end
+    end
 
-        if Rails.application.config.assets.digest
+    def mce_theme_assets
+      @mce_theme_assets ||= Dir.chdir(Mosaico.vendor_asset_root) do
+        Dir.glob(File.join(*%w(mosaico dist vendor themes * theme.js))).each_with_object({}) do |asset_path, ret|
+          name = File.dirname(asset_path).split(File::SEPARATOR).last
+          ret[name] = resolve_asset(asset_path)
+        end
+      end
+    end
+
+    def mce_skin_assets
+      @mce_skin_assets ||= mce_skins.each_with_object({}) do |(name, skin), ret|
+        ret[name] = skin.asset_paths
+      end
+    end
+
+    def mce_skins
+      @mce_skins ||= Dir.chdir(Mosaico.vendor_asset_root) do
+        Dir.glob(File.join(*%w(mosaico dist vendor skins *))).each_with_object({}) do |skin_path, ret|
+          name = File.basename(skin_path)
+          ret[name] = Mosaico::MceSkin.new(name, skin_path)
+        end
+      end
+    end
+
+    def resolve_asset(asset_path)
+      uri = URI.parse(asset_path.gsub(File::SEPARATOR, '/'))
+
+      if Rails.application.config.assets.compile || Mosaico.sprockets_task
+        env = Rails.application.assets || Mosaico.sprockets_task.environment
+        asset = env.find_asset(uri.path)
+
+        path = if Rails.application.config.assets.digest
           asset.try(&:digest_path)
         else
           asset.try(&:logical_path)
         end
+
+        return nil unless path
+        uri.path = path
+        uri.to_s
       else
-        parts = asset_path.split(File::SEPARATOR)
+        parts = uri.path.split('/')
 
         0.upto(parts.size - 1) do |i|
           candidate = File.join(*parts[i..-1])
 
-          if Rails.application.assets_manifest.assets.include?(candidate)
-            return Rails.application.assets_manifest.assets[candidate]
+          if found = Rails.application.assets_manifest.assets[candidate]
+            uri.path = found
+            return uri.to_s
           end
         end
 

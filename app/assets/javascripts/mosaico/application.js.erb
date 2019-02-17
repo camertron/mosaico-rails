@@ -40,12 +40,54 @@ $(document).ready(function() {
   var templateUrl = mosaicoDataElem.data('template-url');
   var projectMetadata = mosaicoDataElem.data('project-metadata');
   var projectContent = mosaicoDataElem.data('project-content');
+  var mcePluginPaths = mosaicoDataElem.data('mce-plugin-paths');
+  var mceThemePaths = mosaicoDataElem.data('mce-theme-paths');
+  var mceSkinPaths = mosaicoDataElem.data('mce-skin-paths');
+
+  // These are tinymce plugins, themes, and skins we should load that mosaico actually
+  // uses. We have to load them explicitly in order to use the correct asset paths.
+  // Christ what a pain this is.
+  var mcePlugins = ['link', 'hr', 'paste', 'lists', 'textcolor', 'code'];
+  var mceTheme = 'modern';
+  var mceSkin = 'gray-flat';
+
+  mcePlugins.forEach(function(plugin) {
+    tinymce.PluginManager.load(
+      plugin, window.mosaico.utilities.urlJoin([
+        '<%= Rails.application.config.assets.prefix %>', mcePluginPaths[plugin]
+      ])
+    );
+  });
+
+  tinymce.ThemeManager.load(
+    mceTheme, window.mosaico.utilities.urlJoin([
+      '<%= Rails.application.config.assets.prefix %>', mceThemePaths[mceTheme]
+    ])
+  );
+
+  // tell tinymce (via knockout) to avoid loading any skin files on it's own,
+  // we'll handle loading them manually below
+  ko.bindingHandlers.wysiwyg.fullOptions.skin = false;
+  ko.bindingHandlers.wysiwyg.standardOptions.skin = false;
+
+  var cssSkinUrls = [
+    mceSkinPaths[mceSkin].css.skin,
+    mceSkinPaths[mceSkin].css.inline_content
+  ];
+
+  cssSkinUrls.forEach(function(url) {
+    tinymce.DOM.styleSheetLoader.load(
+      window.mosaico.utilities.urlJoin([
+        '<%= Rails.application.config.assets.prefix %>', url
+      ])
+    );
+  });
 
   Mosaico.start(
     options,
     templateUrl,
     projectMetadata,
-    projectContent, // i.e. model
+    projectContent, // i.e. view model
     plugins
   );
 });
