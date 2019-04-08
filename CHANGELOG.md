@@ -1,3 +1,7 @@
+1.1.1
+===
+* Fixed asset delivery for custom templates.
+
 1.1.0
 ===
 * Fixed asset delivery for TinyMCE plugins, themes, and skins.

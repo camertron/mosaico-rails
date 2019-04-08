@@ -14,7 +14,7 @@ module Mosaico
         new_asset_path = original_asset_path.sub('google+', 'google_plus')
 
         Rails.application.config.assets.generated.add(new_asset_path, precompile: true) do
-          File.binread(File.join(Mosaico.vendor_asset_root, original_asset_path))
+          File.binread(original_asset_path)
         end
       end
 

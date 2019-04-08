@@ -51,7 +51,7 @@ module Mosaico
     def asset_paths
       @asset_paths ||= list_assets.each_with_object({}) do |asset_path, ret|
         asset_path = replacement_asset_url(asset_path)
-        short_path = asset_path.sub(/\A#{File.join('mosaico', 'templates', name)}#{File::SEPARATOR}/, '')
+        short_path = asset_path.sub(/\A#{dir}#{File::SEPARATOR}?/, '')
         ret[short_path] = Mosaico.resolve_asset(asset_path)
       end
     end
@@ -75,6 +75,7 @@ module Mosaico
     end
 
     def before_register
+      Rails.application.config.assets.paths << File.dirname(dir)
       Rails.application.config.assets.precompile += list_assets
     end
 
@@ -83,11 +84,9 @@ module Mosaico
 
     def list_assets
       subdirs.flat_map do |subdir|
-        Dir.chdir(Mosaico.vendor_asset_root) do
-          # only allow images through for now
-          # TODO: what other file types are we going to need?
-          Dir.glob(File.join('mosaico', 'templates', name, subdir, '**/*.{jpg,gif,png}'))
-        end
+        # only allow images through for now
+        # TODO: what other file types are we going to need?
+        Dir.glob(File.join(dir, subdir, '**/*.{jpg,gif,png}'))
       end
     end
   end
