@@ -112,6 +112,89 @@ Mosaico::Engine.config.placeholder_backend = Mosaico::S3PlaceholderBackend.new
 Mosaico::Engine.config.image_backend = Mosaico::S3ImageBackend.new
 ```
 
+#### Use ActiveStorage Service as Image Backends (Only tested for Rails 5.2)
+If you already have ActiveStorage setup for the application, you can reuse it to implement any supported service as image backends. Here's the example:
+
+```ruby
+module Mosaico
+  class ActiveStorageServiceBackend
+    attr_reader :service, :path_prefix
+  
+    def initialize(service, path_prefix)
+      @service = service
+      @path_prefix = path_prefix
+    end
+  
+    def store(source, as:)
+      key = "#{path_prefix}/#{as}"
+      @service.upload(key, open(source))
+    end
+
+    def retrieve(file)
+      key = "#{path_prefix}/#{file}"
+      data = @service.download(key)
+
+      tmp_file = Tempfile.new(file, :encoding => 'ascii-8bit')
+      tmp_file.write(data)
+      tmp_file.close
+
+      tmp_file.path
+    end
+
+    def url_to(file)
+      key = "#{path_prefix}/#{file}"
+      @service.url(key, filename: ActiveStorage::Filename.new(file), expires_in: nil, disposition: :inline, content_type: nil)
+    end
+  end
+end
+```
+
+With the backend base class finished, create several classes for storing images (that you upload) and placeholders (that Mosaico automatically generates).
+
+```ruby
+module Mosaico
+  class ActiveStorageServiceImageBackend < ActiveStorageServiceBackend
+    def initialize
+      super(ActiveStorage::Blob.service, '/mosaico/images')
+    end
+  end
+  
+  class ActiveStorageServicePlaceholderBackend < ActiveStorageServiceBackend
+    def initialize
+      super(ActiveStorage::Blob.service, '/mosaico/placeholders')
+    end
+  end
+end
+```
+
+Next, since this backend require ActiveStorage to be initialized first, configure Mosaico to use these backends after Rails application is initialized. Insert the following code to config/application.rb or config/environments/<env>.rb:
+
+```ruby
+Rails.application.configure do
+  # ...
+  config.after_initialize do
+    Mosaico::Engine.config.image_backend = Mosaico::ActiveStorageServicePlaceholderBackend.new
+    Mosaico::Engine.config.image_backend = Mosaico::ActiveStorageServiceImageBackend.new
+  end
+  # ...
+end
+```
+
+And last thing, ActiveStorage expect the controller to set ActiveStorage::Current.host to generate proper url. Create a decorator under app/decorators/controllers/mosaico/images_controller_decorator.rb. Then write the following code:
+
+```ruby
+module MosaicoImagesControllerActiveStorageDecorator
+
+  def self.prepended(base)
+    base.before_action do
+      ActiveStorage::Current.host = request.base_url
+    end
+  end
+end
+
+Mosaico::ImagesController.send :prepend, MosaicoImagesControllerActiveStorageDecorator
+```
+
 ### Custom Templates
 
 Although Mosaico comes with several predefined templates ("versafix-1", "tedc15", and "tutorial"), it also supports custom templates. Unfortunately Void Labs' [documentation for their template language](https://github.com/voidlabs/mosaico/wiki/Template-language) is pretty sparse. You'll probably have to experiment with a lot of trial and error to get it to do what you want. If you do decide to create your own template, adding it to the list of available templates is pretty straightforward.
