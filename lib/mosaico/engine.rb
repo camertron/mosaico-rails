@@ -92,8 +92,13 @@ module Mosaico
         )
       end
 
-      Mosaico::Engine.config.placeholder_backend = Mosaico::LocalPlaceholderBackend.new
-      Mosaico::Engine.config.image_backend = Mosaico::LocalImageBackend.new
+      Mosaico::Engine.config.placeholder_backend = nil
+      Mosaico::Engine.config.image_backend = nil
+
+      config.after_initialize do
+        Mosaico::Engine.config.placeholder_backend ||= Mosaico::ActiveStoragePlaceholderBackend.new
+        Mosaico::Engine.config.image_backend = Mosaico::ActiveStorageImageBackend.new
+      end
     end
   end
 end

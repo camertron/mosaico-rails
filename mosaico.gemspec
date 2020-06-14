@@ -18,5 +18,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'generated-assets', '~> 2.0'
   s.add_dependency 'mini_magick'
   s.add_dependency 'mime-types'
-  s.add_dependency 'rails', '>= 4.0'
+  s.add_dependency 'rails', '>= 5.2'
 end

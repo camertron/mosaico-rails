@@ -1,3 +1,7 @@
+2.0.0
+===
+* Switched to ActiveStorage as the default image backend. Hence bumped Rails dependency to 5.2.
+
 1.1.1
 ===
 * Fixed asset delivery for custom templates.
