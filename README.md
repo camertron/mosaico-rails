@@ -50,7 +50,7 @@ Getting up and running is really only the first step. You'll probably want to co
 
 ### Upgrading from version 1 to version 2
 
-We've introduced a new default image backend after 2.0.0. That means, if you are upgrading from v1, you will have to add the follow code in order to keep your current image backend. So that your won't have images missing. Create an initializer in config/initializers/mosaico.rb and add these lines:
+We've introduced a new default image backend since v2.0.0. If you are upgrading from v1, you will have to add the following code in order to keep your current image backend, i.e. to avoid broken images. Create an initializer in config/initializers/mosaico.rb and add these lines:
 
 ```ruby
 Mosaico::Engine.config.placeholder_backend = Mosaico::LocalPlaceholderBackend.new

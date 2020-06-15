@@ -97,7 +97,7 @@ module Mosaico
 
       config.after_initialize do
         Mosaico::Engine.config.placeholder_backend ||= Mosaico::ActiveStoragePlaceholderBackend.new
-        Mosaico::Engine.config.image_backend = Mosaico::ActiveStorageImageBackend.new
+        Mosaico::Engine.config.image_backend ||= Mosaico::ActiveStorageImageBackend.new
       end
     end
   end

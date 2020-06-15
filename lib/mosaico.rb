@@ -24,6 +24,9 @@ end
 module Mosaico
   DEFAULT_LOCALE = :en
 
+  autoload :LocalImageBackend,               'mosaico/local_image_backend'
+  autoload :LocalPlaceholderBackend,         'mosaico/local_placeholder_backend'
+  autoload :LocalBackend,                    'mosaico/local_backend'
   autoload :ActiveStorageImageBackend,       'mosaico/active_storage_image_backend'
   autoload :ActiveStoragePlaceholderBackend, 'mosaico/active_storage_placeholder_backend'
   autoload :ActiveStorageBackend,            'mosaico/active_storage_backend'
