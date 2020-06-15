@@ -2,6 +2,8 @@ require 'mini_magick'
 
 module Mosaico
   class ImagesController < ::Mosaico::ApplicationController
+    before_action :set_active_storage_host
+
     def create
       files = params[:files].map do |file|
         dest_file = File.basename(file.tempfile.path)
@@ -137,6 +139,10 @@ module Mosaico
 
     def placeholder_seed
       Mosaico::Engine.root.join('lib', 'mosaico', 'placeholder.png').to_s
+    end
+
+    def set_active_storage_host
+      ActiveStorage::Current.host = request.base_url
     end
   end
 end
