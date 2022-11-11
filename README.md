@@ -9,7 +9,7 @@ Good-looking, responsive emails are hard to write because of the multitude of em
 mosaico-rails is distributed as a rubygem. You'll need to add it to your Gemfile and run `bundle install` to get started. In your Gemfile, add:
 
 ```ruby
-gem 'mosaico', '~> 1.0'
+gem 'mosaico', '~> 2.0'
 ```
 
 In order to enable image manipulation, you'll need to install [imagemagick](https://www.imagemagick.org/script/index.php) or [graphicsmagick](http://www.graphicsmagick.org/). Both should be available via your package manager of choice. For example on MacOS, run `brew install imagemagick` or `brew install graphicsmagick`.
