@@ -48,8 +48,17 @@ You should be able to drag blocks from the list on the left into the center comp
 
 Getting up and running is really only the first step. You'll probably want to configure Mosaico to actually send email in a production environment. See the remaining sections for guidance.
 
+### Upgrading from version 1 to version 2
+
+We've introduced a new default image backend since v2.0.0. If you are upgrading from v1, you will have to add the following code in order to keep your current image backend, i.e. to avoid broken images. Create an initializer in config/initializers/mosaico.rb and add these lines:
+
+```ruby
+Mosaico::Engine.config.placeholder_backend = Mosaico::LocalPlaceholderBackend.new
+Mosaico::Engine.config.image_backend = Mosaico::LocalImageBackend.new
+```
+
 ### Custom Image Backends
-Uploading images within a Mosaico template is easy - just drag and drop from your filesystem onto any image placeholder. Behind the scenes, Mosaico is resizing and storing the images in the configured storage backend. The default storage backend is just your local filesystem. Images are stored in public/mosaico/images. In a production environment, you'll probably want images to be uploaded to a third-party service like Amazon's S3 or Google Cloud Storage. Unfortunately backends for these services aren't included with Mosaico (I'd glady welcome a pull request). Creating a storage backend is easy though - you just have to implement several methods. For example, here's the skeleton for an S3 backend:
+Uploading images within a Mosaico template is easy - just drag and drop from your filesystem onto any image placeholder. Behind the scenes, Mosaico is resizing and storing the images in the configured storage backend. The default storage backend is just your application's ActiveStorage service. Images are stored with mosaico/images/ and mosaico/placeholders/ as path prefix or key prefix. ActiveStorage comes with support for local storage as well as thrid-party service like Amazon's S3 or Google Cloud Storage. You may want to customize how images are to be uploaded and stored. Creating a storage backend is easy though - you just have to implement several methods. For example, here's the skeleton for an custom S3 backend:
 
 ```ruby
 module Mosaico
